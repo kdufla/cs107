@@ -19,16 +19,16 @@ Account_Init(Bank *bank, Account *account, int id, int branch,
              AccountAmount initialAmount)
 {
   sem_init(&(account->accLock), 0, 1);
-  extern int testfailurecode;
+  //extern int testfailurecode;
 
   account->accountNumber = Account_MakeAccountNum(branch, id);
   account->balance = initialAmount;
-  if (testfailurecode) {
+  /*if (testfailurecode) {
     // To test failures, we initialize every 4th account with a negative value
     if ((id & 0x3) == 0) {
       account->balance = -1;
     }
-  }
+  }*/
 
 }
 

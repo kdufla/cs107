@@ -14,6 +14,7 @@ typedef struct Account {
   sem_t accLock;
 } Account;
 
+//BranchID AccountNum_GetBranchID(AccountNumber accountNum);
 
 Account *Account_LookupByNumber(struct Bank *bank, AccountNumber accountNum);
 

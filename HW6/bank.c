@@ -20,7 +20,7 @@ Bank_Init(int numBranches, int numAccounts, AccountAmount initalAmount,
           int numWorkers)
 {
 	Bank *bank = malloc(sizeof(Bank));
-  bank-> numberWorkersHasToFinish = 0;
+  bank-> numberWorkersHasToFinish = numWorkers;
   sem_init(&(bank->forCheck), 0, 1);
   sem_init(&(bank->letMeStartNextDay), 0, 0);
   sem_init(&(bank->lockForReportTransfer), 0, 1);
@@ -66,7 +66,7 @@ Bank_Balance(Bank *bank, AccountAmount *balance)
 
 /*
  * tranverse and validate each branch.
- */
+ *
 int
 Bank_Validate(Bank *bank)
 {
@@ -82,7 +82,7 @@ Bank_Validate(Bank *bank)
   return err;
 }
 
-/*
+*
  * compare the data inside two banks and see they are exactly the same;
  * it is called in BankTest.
  */
@@ -112,9 +112,9 @@ Bank_Compare(Bank *bank1, Bank *bank2)
 }
 
 void free_all(Bank *bank){
-  for (size_t i = 0; i < bank->numberBranches; i++) {
+  for (unsigned int i = 0; i < bank->numberBranches; i++) {
     Branch *branch=&bank->branches[i];
-    for (size_t j = 0; j < branch->numberAccounts; j++) {
+    for (int j = 0; j < branch->numberAccounts; j++) {
       Account *account=&branch->accounts[j];
       sem_destroy(&account->accLock);
     }

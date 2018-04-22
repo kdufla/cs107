@@ -103,6 +103,14 @@ Report_Transfer(Bank *bank, int workerNum, AccountNumber accountNum,
   return 0;
 }
 
+void prep_exit(Bank *bank, int workerNum){
+  bank-> numberWorkersHasToFinish = numWorkers;
+  for (int i = 0; i < numWorkers-1; i++) {
+		sem_post(&(bank->letMeStartNextDay));
+	}
+	sem_post(&(bank->forCheck));
+}
+
 /*
  * Perform the nightly report. Is called by every worker for each report period. workerNum is
  * the worker making the call.  Returns -1 on error, 0 otherwise.
@@ -111,23 +119,17 @@ int
 Report_DoReport(Bank *bank, int workerNum)
 {
   sem_wait(&(bank->forCheck));
-  bank -> numberWorkersHasToFinish++;
-  if(bank -> numberWorkersHasToFinish == numWorkers)
+  bank -> numberWorkersHasToFinish--;
+  if(bank -> numberWorkersHasToFinish == 0)
   {
     Report *rpt = bank->report;
 
     assert(rpt); Y;
 
     if (rpt->numReports >= MAX_NUM_REPORTS) {
-        // We've run out of report storage for the bank
-
-        for (size_t i = 0; i < numWorkers-1; i++) {
-          sem_post(&(bank->letMeStartNextDay));
-        }
-        bank-> numberWorkersHasToFinish = 0;
-        sem_post(&(bank->forCheck));
-
-        return -1;
+    	// We've run out of report storage for the bank
+			prep_exit(bank,numWorkers);
+			return -1;
     }
 
     /*
@@ -137,20 +139,16 @@ Report_DoReport(Bank *bank, int workerNum)
     int oldNumReports = rpt->numReports; Y;
     rpt->numReports = oldNumReports + 1; Y;
 
-    for (size_t i = 0; i < numWorkers-1; i++) {
-      sem_post(&(bank->letMeStartNextDay));
-    }
-    bank-> numberWorkersHasToFinish = 0;
-    sem_post(&(bank->forCheck));
-
+    prep_exit(bank,numWorkers);
     return err;
   }
   else
   {
     sem_post(&(bank->forCheck));
     sem_wait(&(bank->letMeStartNextDay));
-    return 19;
+    //return 0;
   }
+	return 0;
 }
 
 

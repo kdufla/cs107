@@ -30,7 +30,7 @@ Branch_Init(Bank *bank, int numBranches, int numAccounts,
 
   for (int i = 0; i < numBranches; i++) {
     Branch *branch = &bank->branches[i];
-sem_init(&(branch->branchLock), 0, 1);
+    sem_init(&(branch->branchLock), 0, 1);
     branch->branchID = i;
     branch->balance = 0;
     branch->numberAccounts = accountsPerBranch;
